@@ -2,9 +2,15 @@
 
 ## What This Project Is
 
-Nexus Enterprise is a cloud-powered customer support portal built for enterprise e-commerce environments. The idea behind it was simple but ambitious: instead of customers waiting in a queue to ask a basic question like "where is my order?", an AI system should be able to understand what they are asking, figure out the intent, and respond with the right information and actionable options, instantly.
+Nexus Enterprise is a cloud-powered customer support portal built for enterprise e-commerce environments. The core idea was straightforward but ambitious: instead of customers waiting in a queue to get answers to basic questions like "where is my order?", an AI system should be able to understand what they are asking, identify their intent, and respond instantly with the right information and actionable next steps.
 
-This project brings that idea to life with a full frontend dashboard connected to a live serverless backend hosted on Microsoft Azure. The AI layer processes customer queries in real time, classifies the intent, and returns confidence-scored responses that drive the UI to show meaningful action buttons, not just generic text.
+This project brings that idea to life. It is a complete, working support system with a polished frontend dashboard wired up to a live serverless AI backend hosted on Microsoft Azure. Customers get real answers, not canned scripts, and the interface adapts to what they actually need.
+
+---
+
+## The Problem It Solves
+
+Traditional customer support portals force users to scroll through FAQ pages or wait for a live agent. This project treats that as a solvable engineering problem. By running intent classification on every message through a cloud function, the system can instantly understand what a customer is trying to do and respond with a specific, helpful reply and relevant action options, without any human agent involvement for common request types.
 
 ---
 
@@ -19,37 +25,40 @@ When a customer types a message into the chat interface, the following happens b
 5. The frontend parses the intent and confidence score, then renders a human-readable reply along with context-aware action buttons specific to that intent.
 6. Every message, along with its category and confidence score, is logged to a local SQLite database (`chat_history.db`) for persistence across sessions.
 
-The right panel in the UI also surfaces a live cloud activity log so you can watch exactly what is happening at the system level as you interact with the chatbot.
+A live cloud activity log on the right side of the UI shows exactly what is happening at the system level, in real time, as each message is processed.
 
 ---
 
 ## Key Features
 
 **An AI Chatbot That Understands Context**
-The Nexus AI Assistant does not just keyword-match. It uses a trained intent classification model to understand what the customer actually needs, even when it is phrased differently each time. Supported intents include:
+The Nexus AI Assistant does not keyword-match. It uses a trained intent classification model to understand what the customer actually needs, even when the same question is phrased differently each time. Supported intents include:
 
 - Order tracking and status updates
 - Refund and return requests
 - Delivery timelines and shipping queries
 - Order cancellation requests
 
+**Confidence-Driven Responses**
+Every AI response is backed by a floating-point confidence score. The UI surfaces this score in the cloud log panel, making it easy to evaluate the reliability of each classification and understand where the model is highly certain versus where it might be less sure.
+
 **Automated Action Buttons**
-After every AI response, the UI renders one or more action buttons based on what the system believes the customer wants to do next. For example, if the intent is "order tracking", the bot might surface a "Track My Order" button. This removes friction from the support experience.
+After every AI response, the UI renders one or more action buttons based on what the system believes the customer wants to do next. For example, if the intent is order tracking, the bot surfaces a "Track My Order" button directly inside the conversation. This removes friction from the support experience.
 
 **Multilingual Support**
-The chat interface includes a language selector supporting English, Spanish, French, and Hindi, making it accessible to a broader customer base.
+The chat interface includes a language selector supporting English, Spanish, French, and Hindi, making it accessible to a broader customer base without any additional backend changes.
 
 **Voice Input**
-Customers can also speak their query using the microphone button, which uses the Web Speech API to transcribe and submit the message.
+Customers can speak their query using the microphone button, which uses the Web Speech API to transcribe and submit the message. Useful for mobile or accessibility scenarios.
 
 **Real-Time Cloud Activity Log**
-A dedicated panel on the right side of the UI logs every Azure function call, showing the raw request payload, the returned intent category, and the confidence score. This makes the system fully transparent and easy to debug or demo.
+A dedicated panel on the right side logs every Azure function call with the raw request payload, the classified intent, and the confidence score. This makes the system fully transparent and straightforward to demo or debug during development.
 
 **Persistent Chat History**
-All conversations are stored in a local SQLite database through the proxy server, so sessions are not lost between page refreshes.
+All conversations are stored in a local SQLite database via the proxy server so sessions are preserved across page refreshes without requiring any external database setup.
 
-**Order and Product Modals**
-The sidebar includes quick access to a product catalog and an order history panel, giving the support experience a complete customer portal feel.
+**Order and Product Panels**
+The sidebar gives quick access to a product catalog and an order history panel, giving the support experience the feel of a complete, enterprise customer portal rather than just a standalone chatbot.
 
 ---
 
@@ -70,10 +79,10 @@ The sidebar includes quick access to a product catalog and an order history pane
 
 ```
 Help_center_cloud/
-├── index.html          # The entire frontend application (single-page, self-contained)
+├── index.html          # The complete frontend application (single-page, self-contained)
 ├── proxy_server.py     # Local HTTP server on port 8082, proxies requests to Azure
 ├── add_products.py     # Utility script for populating the product catalog
-├── update_script.py    # Utility script for maintaining/updating data records
+├── update_script.py    # Utility script for maintaining and updating data records
 └── chat_history.db     # SQLite database storing all chat session records
 ```
 
@@ -81,7 +90,7 @@ Help_center_cloud/
 
 ## Getting Started
 
-To run this project on your local machine, you need Python 3 installed.
+You only need Python 3 installed to run this locally. There are no additional dependencies to install.
 
 **Step 1 - Clone the repository**
 
@@ -92,13 +101,13 @@ cd Help_center_cloud
 
 **Step 2 - Start the proxy server**
 
-The proxy server handles all communication between the frontend and the Azure AI backend. Start it before opening the app.
+The proxy server handles all communication between the frontend and the Azure AI backend. It needs to be running before you open the app.
 
 ```bash
 python3 proxy_server.py
 ```
 
-Once running, you should see:
+Once running, you will see:
 
 ```
 Server running on http://localhost:8082
@@ -108,7 +117,7 @@ SQLite Chat History is enabled for GET/POST /api/messages
 
 **Step 3 - Open the application**
 
-Open `index.html` directly in your browser, or serve it from the same directory using Python's built-in HTTP server on a different port:
+Open `index.html` directly in your browser, or serve it from the same directory using Python's built-in HTTP server:
 
 ```bash
 python3 -m http.server 8000
@@ -118,14 +127,14 @@ Then visit `http://localhost:8000` in your browser.
 
 **Step 4 - Try the chatbot**
 
-Type any of the following into the chat input to see the AI intent system in action:
+Type any of the following into the chat input to see the AI intent classification in action:
 
 - "Where is my package?"
 - "I want to request a refund for my last order."
-- "How long will it take for my delivery to arrive?"
+- "How long will my delivery take to arrive?"
 - "Can I cancel my order?"
 
-Watch the right-side cloud log panel update in real time as each query is processed and classified by Azure.
+Watch the right-side cloud log panel update in real time as each query is sent to Azure, classified, and returned with a confidence score.
 
 ---
 
@@ -133,21 +142,27 @@ Watch the right-side cloud log panel update in real time as each query is proces
 
 | Method | Endpoint | Description |
 |---|---|---|
-| GET | `/api/messages` | Retrieves full chat history from SQLite |
-| POST | `/api/messages` | Saves a new message to SQLite |
-| POST | `/api/ProcessQuery` | Proxies an AI query to the Azure Cloud Function |
+| GET | `/api/messages` | Retrieves the full chat history from SQLite |
+| POST | `/api/messages` | Saves a new message entry to SQLite |
+| POST | `/api/ProcessQuery` | Proxies an AI classification query to the Azure Cloud Function |
 
 ---
 
 ## Notes on the Azure Backend
 
-The Azure function endpoint used in this project is:
+The Azure Cloud Function endpoint used in this project:
 
 ```
 https://helpcenterfunction3-fdangsh0f0fcc0f4.centralindia-01.azurewebsites.net/api/ProcessQuery
 ```
 
-This is a serverless Python function deployed on Azure App Service in the Central India region. It accepts a JSON payload with the customer query and returns a structured response containing the predicted intent category and a floating-point confidence score. The proxy layer in `proxy_server.py` handles errors from Azure gracefully and passes them back to the frontend with the appropriate HTTP status code.
+This is a serverless Python function deployed on Azure App Service in the Central India region. It accepts a JSON payload containing the customer query and returns a structured JSON response with the predicted intent category and a floating-point confidence score. The local proxy in `proxy_server.py` handles Azure HTTP errors gracefully and forwards them back to the frontend with the correct status code.
+
+---
+
+## Why This Architecture
+
+Keeping the frontend as a single self-contained HTML file and routing AI calls through a local Python proxy was a deliberate design decision. It keeps the setup minimal, meaning anyone can clone this and run it with a single command, while still connecting to a real, production-grade AI backend on Azure. There is no build step, no package manager, and no environment to configure beyond having Python 3 available.
 
 ---
 
