@@ -1,0 +1,1505 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus Enterprise - AI Support Center</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Professional Color Palette */
+            --primary-navy: #0A192F;
+            --primary-navy-light: #172A45;
+            --accent-maroon: #800000;
+            --accent-maroon-hover: #990000;
+            --bg-color: #F1F5F9;
+            --surface-color: #FFFFFF;
+            --chat-user-bg: #0A192F;
+            --chat-user-text: #FFFFFF;
+            --chat-bot-bg: #FFFFFF;
+            --chat-bot-text: #1E293B;
+            --text-heading: #1E293B;
+            --text-body: #475569;
+            --text-light: #94A3B8;
+            --border-color: #E2E8F0;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            width: 260px;
+            background-color: var(--primary-navy);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--primary-navy-light);
+            z-index: 10;
+        }
+
+        .sidebar-brand {
+            padding: 24px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-bottom: 1px solid var(--primary-navy-light);
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-brand svg {
+            width: 28px;
+            height: 28px;
+            fill: none;
+            stroke: var(--accent-maroon);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .sidebar-menu {
+            display: flex;
+            flex-direction: column;
+            padding: 24px 0;
+            flex: 1;
+        }
+
+        .menu-item {
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            color: #94A3B8;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .menu-item:hover {
+            color: #fff;
+            background-color: var(--primary-navy-light);
+        }
+
+        .menu-item.active {
+            color: #fff;
+            background-color: var(--primary-navy-light);
+            border-left-color: var(--accent-maroon);
+        }
+
+        .menu-item svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main App Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-color);
+        }
+
+        .app-body {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .app-header {
+            background-color: var(--surface-color);
+            padding: 20px 32px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .app-header h1 {
+            font-size: 1.25rem;
+            color: var(--text-heading);
+            font-weight: 600;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 500;
+            color: var(--text-heading);
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            background-color: var(--primary-navy);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        /* Chat Interface */
+        .chat-wrapper {
+            flex: 1;
+            padding: 32px;
+            display: flex;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--surface-color);
+            border-radius: 12px;
+            box-shadow: var(--shadow-md);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .chat-header {
+            background-color: var(--primary-navy);
+            padding: 16px 24px;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ai-status-indicator {
+            width: 10px;
+            height: 10px;
+            background-color: #10B981;
+            /* Green status dot */
+            border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(16, 185, 129, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+            }
+        }
+
+        .chat-header-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .chat-subtitle {
+            font-size: 0.8rem;
+            color: #94A3B8;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 24px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background-color: #F8FAFC;
+        }
+
+        .message-row {
+            display: flex;
+            width: 100%;
+        }
+
+        .message-row.user {
+            justify-content: flex-end;
+        }
+
+        .message-row.bot {
+            justify-content: flex-start;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        .bot .message-avatar {
+            background-color: rgba(128, 0, 0, 0.1);
+            color: var(--accent-maroon);
+        }
+
+        .bot .message-avatar svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .message-bubble {
+            max-width: 75%;
+            padding: 14px 18px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            position: relative;
+        }
+
+        .user .message-bubble {
+            background-color: var(--chat-user-bg);
+            color: var(--chat-user-text);
+            border-top-right-radius: 4px;
+        }
+
+        .bot .message-bubble {
+            background-color: var(--chat-bot-bg);
+            color: var(--chat-bot-text);
+            border-top-left-radius: 4px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+        }
+
+        .message-meta {
+            font-size: 0.75rem;
+            color: #94A3B8;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .user .message-meta {
+            justify-content: flex-end;
+        }
+
+        .intent-badge {
+            background-color: rgba(128, 0, 0, 0.08);
+            color: var(--accent-maroon);
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Loading Indicator */
+        .typing-indicator {
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 18px;
+            background-color: var(--chat-bot-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            border-top-left-radius: 4px;
+            width: fit-content;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            background-color: #94A3B8;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) {
+            animation-delay: -0.32s;
+        }
+
+        .dot:nth-child(2) {
+            animation-delay: -0.16s;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            80%,
+            100% {
+                transform: scale(0);
+            }
+
+            40% {
+                transform: scale(1);
+            }
+        }
+
+        /* Input Area */
+        .chat-input-area {
+            padding: 20px 24px;
+            background-color: var(--surface-color);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            background-color: #F8FAFC;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 4px 12px;
+            display: flex;
+            align-items: center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: var(--accent-maroon);
+            box-shadow: 0 0 0 3px rgba(128, 0, 0, 0.1);
+        }
+
+        .chat-input {
+            width: 100%;
+            border: none;
+            background: transparent;
+            padding: 12px 0;
+            font-size: 0.95rem;
+            color: var(--text-heading);
+            outline: none;
+            resize: none;
+            height: 44px;
+            max-height: 120px;
+        }
+
+        .chat-input::placeholder {
+            color: #94A3B8;
+        }
+
+        .send-btn {
+            background-color: var(--accent-maroon);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            flex-shrink: 0;
+        }
+
+        .send-btn:hover {
+            background-color: var(--accent-maroon-hover);
+        }
+
+        .send-btn svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transform: translateX(1px);
+            /* optical alignment */
+        }
+
+        .mic-btn.recording {
+            color: #EF4444 !important;
+            animation: pulse-red 1.5s infinite;
+        }
+
+        @keyframes pulse-red {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            50% {
+                transform: scale(1.15);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .action-suggestions {
+            display: flex;
+            gap: 10px;
+            padding: 0 24px 16px 24px;
+            background-color: var(--surface-color);
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .action-suggestions::-webkit-scrollbar {
+            display: none;
+        }
+
+        .suggestion-chip {
+            background-color: #F1F5F9;
+            border: 1px solid var(--border-color);
+            color: var(--text-body);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .suggestion-chip:hover {
+            background-color: var(--primary-navy);
+            color: white;
+            border-color: var(--primary-navy);
+        }
+
+        /* Action Buttons within bot messages */
+        .msg-actions {
+            margin-top: 12px;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .msg-action-btn {
+            background-color: transparent;
+            border: 1px solid var(--accent-maroon);
+            color: var(--accent-maroon);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .msg-action-btn:hover {
+            background-color: var(--accent-maroon);
+            color: white;
+        }
+
+        /* Cloud Activity Log Panel */
+        .cloud-panel {
+            width: 320px;
+            background-color: var(--primary-navy);
+            border-left: 1px solid var(--primary-navy-light);
+            display: flex;
+            flex-direction: column;
+            color: white;
+            z-index: 5;
+        }
+
+        .cloud-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--primary-navy-light);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+        }
+
+        .cloud-header svg {
+            width: 20px;
+            height: 20px;
+            fill: none;
+            stroke: var(--accent-maroon);
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .cloud-logs {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.8rem;
+        }
+
+        .log-entry {
+            background-color: var(--primary-navy-light);
+            border-radius: 8px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            animation: fadeIn 0.4s ease-out forwards;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .log-title {
+            color: #94A3B8;
+            margin-bottom: 10px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .log-status {
+            color: #10B981;
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            background-color: rgba(16, 185, 129, 0.1);
+            border-radius: 4px;
+        }
+
+        .log-status.error {
+            color: #EF4444;
+            background-color: rgba(239, 68, 68, 0.1);
+        }
+
+        .log-code {
+            color: #38BDF8;
+            white-space: pre-wrap;
+            word-break: break-all;
+            line-height: 1.5;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Order Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+            animation: fadeIn 0.2s ease-out forwards;
+        }
+
+        .modal-content {
+            background: white;
+            width: 550px;
+            max-width: 90%;
+            border-radius: 12px;
+            padding: 28px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--text-heading);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #94A3B8;
+        }
+
+        .close-btn:hover {
+            color: #1E293B;
+        }
+
+        .order-card {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #F8FAFC;
+        }
+
+        .order-info h3 {
+            font-size: 1rem;
+            color: var(--text-heading);
+            margin-bottom: 4px;
+        }
+
+        .order-info p {
+            font-size: 0.85rem;
+            color: var(--text-body);
+        }
+
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-ongoing {
+            background: rgba(56, 189, 248, 0.1);
+            color: #0284C7;
+        }
+
+        .status-past {
+            background: rgba(16, 185, 129, 0.1);
+            color: #059669;
+        }
+
+        .btn-select {
+            background: var(--primary-navy);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .btn-select:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <svg viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+            </svg>
+            Nexus
+        </div>
+        <nav class="sidebar-menu">
+            <a href="#" class="menu-item" onclick="openProductsModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <rect x="3" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="3" width="7" height="7"></rect>
+                    <rect x="14" y="14" width="7" height="7"></rect>
+                    <rect x="3" y="14" width="7" height="7"></rect>
+                </svg>
+                Shop Products
+            </a>
+            <a href="#" class="menu-item" onclick="openModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <circle cx="9" cy="21" r="1"></circle>
+                    <circle cx="20" cy="21" r="1"></circle>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                </svg>
+                My Orders
+            </a>
+            <a href="#" class="menu-item active">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                AI Help Center
+            </a>
+            <a href="#" class="menu-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                    stroke-linejoin="round">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                Account Settings
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <header class="app-header">
+            <h1>Customer Support Hub</h1>
+            <div class="user-profile">
+                <span>Customer Portal</span>
+                <div class="user-avatar">JD</div>
+            </div>
+        </header>
+
+        <div class="app-body">
+            <section class="chat-wrapper">
+                <div class="chat-container">
+                    <!-- Header -->
+                    <div class="chat-header">
+                        <div class="ai-status-indicator"></div>
+                        <div class="chat-header-info">
+                            <span class="chat-title">Nexus AI Assistant</span>
+                            <span class="chat-subtitle">Automated Support & Intent Resolution</span>
+                        </div>
+                        <div style="margin-left:auto; display:flex; gap:12px; align-items:center;">
+                            <select id="langSelect"
+                                style="background:#172A45; color:#fff; border:1px solid #172A45; padding:6px; border-radius:6px; font-size:0.85rem; outline:none; cursor:pointer;">
+                                <option value="en">🇺🇸 English</option>
+                                <option value="es">🇪🇸 Español</option>
+                                <option value="fr">🇫🇷 Français</option>
+                                <option value="hi">🇮🇳 हिन्दी</option>
+                            </select>
+                            <button id="ttsToggle" onclick="toggleTTS()"
+                                style="background:transparent; border:none; color:#10B981; cursor:pointer; display:flex; align-items:center;"
+                                title="Toggle Speech Output">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="ttsIcon">
+                                    <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                                    <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Chat History -->
+                    <div class="chat-messages" id="chatMessages">
+                        <div class="message-row bot">
+                            <div class="message-avatar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                                </svg>
+                            </div>
+                            <div class="message-content">
+                                <div class="message-bubble">
+                                    Hello! I am the Nexus Support Assistant powered by AI. I can quickly assist you with
+                                    order tracking, refunds, delivery queries, and cancellations. How can I help you
+                                    today?
+                                </div>
+                                <div class="message-meta">System &bull; Just now</div>
+                            </div>
+                        </div>
+
+                        <!-- Typing Indicator (Hidden by default) -->
+                        <div class="message-row bot" id="typingIndicator" style="display: none;">
+                            <div class="message-avatar">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                    stroke-linecap="round" stroke-linejoin="round">
+                                    <path
+                                        d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                                </svg>
+                            </div>
+                            <div class="typing-indicator" style="display: flex;">
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                                <div class="dot"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Action Suggestions -->
+                    <div class="action-suggestions" id="actionSuggestions">
+                        <div class="suggestion-chip" onclick="fillAndSend('Where is my order? I want to track it.')">
+                            Track
+                            Order</div>
+                        <div class="suggestion-chip" onclick="fillAndSend('I need to request a refund')">Request Refund
+                        </div>
+                        <div class="suggestion-chip" onclick="fillAndSend('When will my package be delivered?')">
+                            Delivery
+                            Status</div>
+                        <div class="suggestion-chip" onclick="fillAndSend('I want to cancel my recent purchase')">Cancel
+                            Order</div>
+                    </div>
+
+                    <!-- Input Area -->
+                    <div class="chat-input-area">
+                        <div class="input-wrapper">
+                            <input type="text" id="chatInput" class="chat-input"
+                                placeholder="Describe your issue or ask a question..." autocomplete="off">
+                            <button class="mic-btn" id="micBtn" onclick="toggleDictation()"
+                                style="background:transparent; border:none; color:#94A3B8; cursor:pointer; padding:0 8px; display:flex; align-items:center;"
+                                title="Use Voice Input">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                    <line x1="12" y1="19" x2="12" y2="23"></line>
+                                    <line x1="8" y1="23" x2="16" y2="23"></line>
+                                </svg>
+                            </button>
+                        </div>
+                        <button class="send-btn" id="sendBtn" onclick="sendMessage()">
+                            <svg viewBox="0 0 24 24">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Live Cloud Activity Log Sidebar -->
+            <aside class="cloud-panel">
+                <div class="cloud-header">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M17.5 19H9a7 7 0 1 1 6.71-9.9 5.5 5.5 0 0 1 1.79 9.9z"></path>
+                    </svg>
+                    Live Cloud Activity
+                </div>
+                <div class="cloud-logs" id="cloudLogs">
+                    <div class="log-entry">
+                        <div class="log-title">
+                            <span>System Ready</span>
+                            <span class="log-status">Connected</span>
+                        </div>
+                        <div class="log-code">Application initialized. Connected to Azure Central India region. Waiting
+                            for events...</div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+        <!-- Orders Modal Prototype -->
+        <div class="modal-overlay" id="ordersModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">My Recent Orders</div>
+                    <button class="close-btn" onclick="closeModal()">×</button>
+                </div>
+
+                <div id="ordersList">
+                    <!-- Ongoing Order -->
+                    <div class="order-card">
+                        <div class="order-info">
+                            <h3>MacBook Air M3 - Space Gray</h3>
+                            <p>Order ID: ORD-109245 • Placed: Yesterday</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <span id="badge-ORD-109245" class="status-badge status-ongoing"
+                                style="display:block; margin-bottom:8px;">In
+                                Transit</span>
+                            <button class="btn-select" onclick="selectOrder('ORD-109245', 'track')">Track</button>
+                            <button id="btn-cancel-ORD-109245" class="btn-select"
+                                onclick="selectOrder('ORD-109245', 'cancel')"
+                                style="background:#EF4444; margin-left:4px;">Cancel</button>
+                        </div>
+                    </div>
+
+                    <!-- Past Order 1 -->
+                    <div class="order-card">
+                        <div class="order-info">
+                            <h3>AirPods Pro (2nd Gen)</h3>
+                            <p>Order ID: ORD-098877 • Placed: 2 weeks ago</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <span id="badge-ORD-098877" class="status-badge status-past"
+                                style="display:block; margin-bottom:8px;">Delivered</span>
+                            <button id="btn-return-ORD-098877" class="btn-select"
+                                onclick="selectOrder('ORD-098877', 'return')">Start Return</button>
+                        </div>
+                    </div>
+
+                    <!-- Past Order 2 -->
+                    <div class="order-card">
+                        <div class="order-info">
+                            <h3>Logitech MX Master 3S</h3>
+                            <p>Order ID: ORD-083112 • Placed: 1 month ago</p>
+                        </div>
+                        <div style="text-align:right;">
+                            <span class="status-badge status-past">Delivered</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Products Modal Prototype -->
+        <div class="modal-overlay" id="productsModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Shop Products</div>
+                    <button class="close-btn" onclick="closeProductsModal()">×</button>
+                </div>
+
+                <div class="order-card">
+                    <div class="order-info">
+                        <h3>iPhone 15 Pro Max - Titanium</h3>
+                        <p>$1,199.00</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <button class="btn-select" onclick="buyProduct('iPhone 15 Pro Max', '$1,199.00')">Buy
+                            Now</button>
+                    </div>
+                </div>
+
+                <div class="order-card">
+                    <div class="order-info">
+                        <h3>Sony WH-1000XM5 Headphones</h3>
+                        <p>$348.00</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <button class="btn-select" onclick="buyProduct('Sony WH-1000XM5 Headphones', '$348.00')">Buy
+                            Now</button>
+                    </div>
+                </div>
+
+                <div class="order-card">
+                    <div class="order-info">
+                        <h3>Samsung Neo QLED 4K TV (65")</h3>
+                        <p>$1,899.00</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <button class="btn-select" onclick="buyProduct('Samsung Neo QLED 8K TV', '$1,899.00')">Buy
+                            Now</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+
+        const chatMessages = document.getElementById('chatMessages');
+        const chatInput = document.getElementById('chatInput');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const actionSuggestions = document.getElementById('actionSuggestions');
+        const cloudLogs = document.getElementById('cloudLogs');
+        const langSelect = document.getElementById('langSelect');
+        const micBtn = document.getElementById('micBtn');
+        const ttsIcon = document.getElementById('ttsIcon');
+
+        let isTTSOn = true;
+        let isRecording = false;
+        let recognition = null;
+
+        // Initialize Speech Recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRec();
+            recognition.continuous = false;
+            recognition.interimResults = false;
+
+            recognition.onstart = function () {
+                isRecording = true;
+                micBtn.classList.add('recording');
+                chatInput.placeholder = "Listening...";
+            };
+
+            recognition.onresult = function (event) {
+                const transcript = event.results[0][0].transcript;
+                chatInput.value = transcript;
+            };
+
+            recognition.onend = function () {
+                isRecording = false;
+                micBtn.classList.remove('recording');
+                chatInput.placeholder = "Describe your issue or ask a question...";
+                if (chatInput.value.trim() !== "") {
+                    sendMessage();
+                }
+            };
+
+            recognition.onerror = function (e) {
+                console.error("Speech recognition error", e);
+                isRecording = false;
+                micBtn.classList.remove('recording');
+                chatInput.placeholder = "Describe your issue or ask a question...";
+            };
+        }
+
+        // Load History from SQLite DB on startup
+        window.addEventListener('load', async () => {
+            try {
+                const res = await fetch('/api/messages');
+                const messages = await res.json();
+                if (messages.length > 0) {
+                    addCloudLog("Database Connected", `Found ${messages.length} previous messages loaded from SQLite table!`, false);
+
+                    // Clear placeholder defaults
+                    chatMessages.innerHTML = '';
+                    chatMessages.appendChild(typingIndicator);
+
+                    messages.forEach(msg => {
+                        if (msg.sender === 'user') {
+                            appendUserMessageUI(msg.text, msg.timestamp);
+                        } else {
+                            const botReplyHTML = generateBotResponseHTML(msg.category, msg.confidenceScore, msg.text);
+                            appendBotMessageUI(botReplyHTML, msg.category, msg.confidenceScore, msg.timestamp);
+                        }
+                    });
+                }
+            } catch (e) { console.error("Could not load from DB", e); }
+        });
+
+        function toggleDictation() {
+            if (!recognition) {
+                alert("Speech Recognition is not supported in this browser.");
+                return;
+            }
+            if (isRecording) {
+                recognition.stop();
+            } else {
+                recognition.lang = langSelect.value;
+                recognition.start();
+            }
+        }
+
+        function toggleTTS() {
+            isTTSOn = !isTTSOn;
+            if (isTTSOn) {
+                ttsIcon.parentElement.style.color = "#10B981";
+                ttsIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>`;
+            } else {
+                ttsIcon.parentElement.style.color = "#94A3B8";
+                ttsIcon.innerHTML = `<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line>`;
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel(); // Instantly stop currently playing audio
+                }
+            }
+        }
+
+        function speakText(text) {
+            if (!isTTSOn || !window.speechSynthesis) return;
+            // Clean HTML tags and markdown before reading
+            const cleanText = text.replace(/<[^>]*>?/gm, '').replace(/\*\*/g, '');
+            const utterance = new SpeechSynthesisUtterance(cleanText);
+            utterance.lang = langSelect.value;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Translation utility via Google Translate unofficial API
+        async function translateText(text, targetLang) {
+            if (targetLang === 'en') return text;
+            try {
+                const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLang}&dt=t&q=${encodeURI(text)}`;
+                const res = await fetch(url);
+                const data = await res.json();
+                return data[0].map(item => item[0]).join("");
+            } catch (e) {
+                console.error("Translation error", e);
+                return text;
+            }
+        }
+
+        chatInput.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function fillAndSend(text) {
+            chatInput.value = text;
+            sendMessage();
+        }
+
+        function addCloudLog(title, jsonStr, isError = false) {
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+            const logClass = isError ? 'error' : '';
+            const statusText = isError ? 'FAILED' : '200 OK';
+
+            const html = `
+                <div class="log-entry">
+                    <div class="log-title">
+                        <span>${title}</span>
+                        <span class="log-status ${logClass}">${statusText}</span>
+                    </div>
+                    <div class="log-code">${jsonStr}</div>
+                </div>
+            `;
+            cloudLogs.insertAdjacentHTML('afterbegin', html);
+        }
+
+        async function saveMessageToDB(sender, text, category, confidenceScore, timestamp) {
+            try {
+                await fetch('/api/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ sender, text, category, confidenceScore, timestamp })
+                });
+            } catch (e) { }
+        }
+
+        async function sendMessage() {
+            const originalText = chatInput.value.trim();
+            if (!originalText) return;
+
+            chatInput.value = '';
+            actionSuggestions.style.display = 'none';
+
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            appendUserMessageUI(originalText, timeStr);
+            saveMessageToDB('user', originalText, null, null, timeStr);
+
+            showTyping();
+
+            // 1. Translate user input to English (if needed)
+            const sourceLang = langSelect.value;
+            let englishText = originalText;
+
+            if (sourceLang !== 'en') {
+                englishText = await translateText(originalText, 'en');
+                addCloudLog("Azure Translator API", `Translated to English:
+"${englishText}"`);
+            }
+
+            const requestPayload = { text: englishText };
+            addCloudLog("Outgoing POST Request", JSON.stringify(requestPayload, null, 2));
+            const startTime = Date.now();
+
+            try {
+                // 2. Proxied Call to Azure
+                const response = await fetch("/api/ProcessQuery", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(requestPayload)
+                });
+
+                if (!response.ok) throw new Error("Network Error");
+
+                const data = await response.json();
+                const latency = Date.now() - startTime;
+                addCloudLog(`Azure Response (${latency}ms)`, JSON.stringify(data, null, 2));
+
+                // 3. Generate internal english intent mapping
+                const { responseText, actionsHTML } = generateBotResponseTextAndActions(data.category, data.confidenceScore);
+
+                // 4. Translate bot answer back to user's native tongue
+                let localizedResponse = responseText;
+                if (sourceLang !== 'en') {
+                    localizedResponse = await translateText(responseText, sourceLang);
+                }
+
+                const botReplyHTML = localizedResponse + actionsHTML;
+                const botTimeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                hideTyping();
+                appendBotMessageUI(botReplyHTML, data.category, data.confidenceScore, botTimeStr);
+
+                // 5. Save output to internal SQLite DB
+                saveMessageToDB('bot', localizedResponse, data.category, data.confidenceScore, botTimeStr);
+
+                // 6. Speak translation/native via Browser TTS
+                speakText(localizedResponse);
+
+            } catch (error) {
+                console.error("Error:", error);
+                const latency = Date.now() - startTime;
+                addCloudLog(`Azure Error (${latency}ms)`, error.message || "Connection refused", true);
+                hideTyping();
+
+                let errorMsg = "I am currently experiencing connection issues to the support database. Please try again later.";
+                if (sourceLang !== 'en') errorMsg = await translateText(errorMsg, sourceLang);
+
+                const botTimeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                appendBotMessageUI(errorMsg, "Error", 0, botTimeStr);
+                speakText(errorMsg);
+            }
+        }
+
+        function appendUserMessageUI(text, timeStr) {
+            const html = `
+                <div class="message-row user">
+                    <div class="message-content">
+                        <div class="message-bubble">${escapeHTML(text)}</div>
+                        <div class="message-meta">${timeStr}</div>
+                    </div>
+                </div>
+            `;
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            chatMessages.insertBefore(div.firstElementChild, typingIndicator);
+            scrollToBottom();
+        }
+
+        function appendBotMessageUI(contentHTML, category, confidence, timeStr) {
+            let badgeHTML = '';
+            if (category && category !== 'Error' && category !== null) {
+                const confPercent = confidence ? (confidence * 100).toFixed(0) + '%' : '';
+                badgeHTML = `
+                    <div class="intent-badge">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        Intent: ${category} ${confPercent}
+                    </div>
+                `;
+            }
+
+            const html = `
+                <div class="message-row bot">
+                    <div class="message-avatar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                    </div>
+                    <div class="message-content">
+                        <div class="message-bubble">${contentHTML}</div>
+                        <div class="message-meta">
+                            Nexus AI &bull; ${timeStr} 
+                            ${badgeHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+            const div = document.createElement('div');
+            div.innerHTML = html;
+            chatMessages.insertBefore(div.firstElementChild, typingIndicator);
+            scrollToBottom();
+        }
+
+        function generateBotResponseHTML(category, confidence, historicText = null) {
+            if (historicText) {
+                const result = generateBotResponseTextAndActions(category, confidence);
+                return historicText + result.actionsHTML;
+            }
+            const result = generateBotResponseTextAndActions(category, confidence);
+            return result.responseText + result.actionsHTML;
+        }
+
+        function generateBotResponseTextAndActions(category, confidence) {
+            const intent = (category || "").toLowerCase();
+            let responseText = "";
+            let actionsHTML = "";
+
+            if (intent.includes("order") || intent.includes("track")) {
+                responseText = "I see you are inquiring about an order's status. To fetch the most accurate tracking details, please provide your **9-digit Order ID (e.g., ORD-123456789)**.";
+                actionsHTML = `
+                    <div class="msg-actions">
+                        <button class="msg-action-btn" onclick="openModal()">View Recent Orders</button>
+                    </div>
+                `;
+            }
+            else if (intent.includes("refund") || intent.includes("return")) {
+                responseText = "It looks like you need help with a refund or return. Our policy allows returns within 30 days of the delivery date. Would you like me to initiate the automated return process for your last order?";
+                actionsHTML = `
+                    <div class="msg-actions">
+                        <button class="msg-action-btn" onclick="openModal()">Select Eligible Order for Return</button>
+                    </div>
+                `;
+            }
+            else if (intent.includes("cancel")) {
+                responseText = "I understand you wish to cancel an order. If your items haven't shipped yet, we can usually process a cancellation immediately. What is the Order ID you wish to cancel?";
+                actionsHTML = `
+                    <div class="msg-actions">
+                        <button class="msg-action-btn" onclick="openModal()">Select Active Order to Cancel</button>
+                    </div>
+                `;
+            }
+            else if (intent.includes("deliver") || intent.includes("shipping")) {
+                responseText = "Standard delivery times range from 3-5 business days depending on your region. Expedited shipping takes 1-2 days. Did you have a specific shipment you wanted me to look up?";
+                actionsHTML = `
+                    <div class="msg-actions">
+                        <button class="msg-action-btn" onclick="openModal()">View Delivery Status</button>
+                    </div>
+                `;
+            }
+            else {
+                responseText = `I have categorized your request under **${category || "General"}**. I can try to find relevant articles for this, or connect you with a live human agent.`;
+            }
+
+            return { responseText, actionsHTML };
+        }
+
+        // Modal Functionality
+        const ordersModal = document.getElementById('ordersModal');
+
+        function openModal() {
+            ordersModal.classList.add('active');
+        }
+
+        function closeModal() {
+            ordersModal.classList.remove('active');
+        }
+
+        // Trigger action based on UI button interact (e.g Track/Cancel)
+        function selectOrder(orderId, actionType) {
+            closeModal();
+            let userIntent = "";
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            if (actionType === 'track') {
+                userIntent = `Track order ${orderId}`;
+                fillAndSend(userIntent);
+            } else if (actionType === 'cancel') {
+                userIntent = `Please cancel my order ${orderId}.`;
+                appendUserMessageUI(userIntent, timeStr);
+                saveMessageToDB('user', userIntent, null, null, timeStr);
+
+                showTyping();
+                setTimeout(() => {
+                    hideTyping();
+                    const reply = `Status updated! Your cancellation request for **${orderId}** was successful. We matched it with your original payment method and a full refund will appear in 3-5 business days.`;
+                    const botTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    appendBotMessageUI(reply, "Cancellation_Success", 0.98, botTime);
+                    saveMessageToDB('bot', reply, "Cancellation_Success", 0.98, botTime);
+                    speakText(`Status updated! Your cancellation request for ${orderId} was successful.`);
+
+                    // Visual Update DOM Elements
+                    const badge = document.getElementById(`badge-${orderId}`);
+                    if (badge) {
+                        badge.className = "status-badge status-past";
+                        badge.innerText = "Cancelled";
+                    }
+                    const btn = document.getElementById(`btn-cancel-${orderId}`);
+                    if (btn) btn.style.display = 'none';
+                }, 1500);
+
+            } else if (actionType === 'return') {
+                userIntent = `I would like to start a return for ${orderId}.`;
+                appendUserMessageUI(userIntent, timeStr);
+                saveMessageToDB('user', userIntent, null, null, timeStr);
+
+                showTyping();
+                setTimeout(() => {
+                    hideTyping();
+                    const reply = `Your return has been initiated for **${orderId}**. I have emailed you a prepaid UPS shipping label. Please pack the items securely and drop them off at any UPS location.`;
+                    const botTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                    appendBotMessageUI(reply, "Return_Success", 0.99, botTime);
+                    saveMessageToDB('bot', reply, "Return_Success", 0.99, botTime);
+                    speakText(reply);
+
+                    // Visual Update DOM Elements
+                    const badge = document.getElementById(`badge-${orderId}`);
+                    if (badge) {
+                        badge.className = "status-badge status-past";
+                        badge.innerText = "Return Pending";
+                        badge.style.background = "rgba(245, 158, 11, 0.1)"; // amber tint
+                        badge.style.color = "#D97706";
+                    }
+                    const btn = document.getElementById(`btn-return-${orderId}`);
+                    if (btn) btn.style.display = 'none';
+                }, 1500);
+            }
+        }
+
+
+        const productsModal = document.getElementById('productsModal');
+        function openProductsModal() {
+            productsModal.classList.add('active');
+        }
+        function closeProductsModal() {
+            productsModal.classList.remove('active');
+        }
+
+        function buyProduct(itemName, itemPrice) {
+            closeProductsModal();
+            const orderId = 'ORD-' + Math.floor(100000 + Math.random() * 900000); // Generate Random Order ID
+            const timeStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+            // User intention mock
+            const userIntent = `I just placed an order for ${itemName}.`;
+            appendUserMessageUI(userIntent, timeStr);
+            saveMessageToDB('user', userIntent, null, null, timeStr);
+
+            showTyping();
+            setTimeout(() => {
+                hideTyping();
+
+                // Add order to modal instantly
+                const orderHTML = `
+                <div class="order-card">
+                    <div class="order-info">
+                        <h3>${itemName}</h3>
+                        <p>Order ID: ${orderId} • Placed: Just Now</p>
+                    </div>
+                    <div style="text-align:right;">
+                        <span id="badge-${orderId}" class="status-badge status-ongoing" style="display:block; margin-bottom:8px;">Processing</span>
+                        <button class="btn-select" onclick="selectOrder('${orderId}', 'track')">Track</button>
+                        <button id="btn-cancel-${orderId}" class="btn-select" onclick="selectOrder('${orderId}', 'cancel')"
+                            style="background:#EF4444; margin-left:4px;">Cancel</button>
+                    </div>
+                </div>`;
+
+                const ordersList = document.getElementById('ordersList');
+                if (ordersList) {
+                    ordersList.insertAdjacentHTML('afterbegin', orderHTML);
+                }
+
+                // Bot Success Response
+                const reply = `Thank you for your purchase! Your order for **${itemName}** (${itemPrice}) has been successfully placed. Your Order ID is **${orderId}**.`;
+                const botTime = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                appendBotMessageUI(reply, "Purchase_Success", 0.99, botTime);
+                saveMessageToDB('bot', reply, "Purchase_Success", 0.99, botTime);
+                speakText(`Thank you for your purchase. Your order for ${itemName} has been confirmed.`);
+            }, 1200);
+        }
+
+        function showTyping() {
+            typingIndicator.style.display = 'flex';
+            scrollToBottom();
+        }
+
+        function hideTyping() {
+            typingIndicator.style.display = 'none';
+        }
+
+        function scrollToBottom() {
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Utility to prevent XSS in chat
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g,
+                tag => ({
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    "'": '&#39;',
+                    '"': '&quot;'
+                }[tag])
+            );
+        }
+
+    </script>
+</body>
+
+</html>
